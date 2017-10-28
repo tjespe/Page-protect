@@ -20,11 +20,20 @@ function getSavedPageState(url, callback) {
 getSavedPageState(location.hostname, (state)=>{
   console.log(state);
   if (state) {
+    document.body.innerHTML += `<div id="overlay-pr" style="
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        background: #fff;
+        z-index: 99999;
+      top: 0;
+    "></div>`
     chrome.storage.sync.get("password", (items)=>{
       while (prompt("Please enter your password") !== items.password) {
         alert("Sorry! Wrong password! Please try again!");
       }
       console.log("Passwords matched!");
+      document.body.removeChild(document.getElementById("overlay-pr"));
     });
   }
 });
