@@ -24,6 +24,14 @@
         color: #337ab7;
         outline:none;
       }
+
+      input {
+        width: 240px;
+        margin: 5px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: medium;
+      }
     </style>
 
     <!--
@@ -37,7 +45,10 @@
 
   <body>
     <h1>Page-Protect</h1>
-    <a id="set-password" href="#">Set your password</a>
-    <a style="display:none" id="a" href="#">Enable password protection for this page</a>
+    <input id="password-input" type="password">
+    <div id="actions">
+      <a id="set-password" href="#">Set your password</a>
+      <a style="display:none" id="a" href="#">Enable password protection for this page</a>
+    </div>
   </body>
 </html>

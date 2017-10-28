@@ -1,4 +1,13 @@
 console.log("Running popup.js");
+var pi = null;
+function hide_pi () {
+  pi.style.display = "none";
+  pi.value = "";
+}
+function show_pi () {
+  pi.style.display = "block";
+}
+
 /**
  * Get the current domain.
  *
@@ -45,58 +54,30 @@ function getSavedPageState(url, callback) {
  * @param {function} callback Function to be called after saving state.
  */
 function changePageProtectionState(callback) {
-  if (prompt("Enter your password to proceed:") == localStorage.password) {
-    var items = {};
-    getCurrentTabUrl((url)=>{
-      getSavedPageState(url, (state)=>{
-        items[url] = !state;
-        chrome.storage.sync.set(items);
-        if (typeof callback !== 'undefined') callback(!state);
-      });
+  var items = {};
+  getCurrentTabUrl((url)=>{
+    getSavedPageState(url, (state)=>{
+      items[url] = !state;
+      chrome.storage.sync.set(items);
+      if (typeof callback !== 'undefined') callback(!state);
     });
-  }
-}
-
-/**
- * Check if a password is set
- * @param {function(bool)} callback Function to be called after checking if password is set.
- */
-function getKeyState(callback) {
-  console.log("Getting state of password");
-  callback(typeof localStorage.password === "string");
-}
-
-/**
- * Set a password
- * @param {function()} callback Function to be called after setting password.
- */
-function setKey(callback) {
-  while (typeof key !== "string" || !key.length) {
-    var key = prompt("Please enter a password");
-  }
-  localStorage.password = key;
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  pi = document.getElementById("password-input");
   getCurrentTabUrl((url) => {
     var a = document.getElementById('a');
     var sp = document.getElementById("set-password");
-
-    // Check if a password is set and update the popup view accordingly
-    function updateContentIfKeyIsSet () {
-      getKeyState((keyIsSet)=>{
-        if (keyIsSet) {
-          sp.style.display = "none";
-          a.style.display = "block";
-          updateContent();
-        }
-      });
-    }
-    updateContentIfKeyIsSet();
+    var actions = document.getElementById("actions");
+    actions.style.display = "none";
 
     // Load the saved state for this domain and modify the popup window
     // text, if needed.
     function updateContent () {
+      actions.style.display = pi.value == localStorage.password || !localStorage.hasOwnProperty("password") ? "block" : "none";
+      a.style.display = localStorage.hasOwnProperty("password") ? "block" : "none";
+      sp.style.display = localStorage.hasOwnProperty("password") ? "none" : "block";
       getSavedPageState(url, (state) => {
         a.innerText = state ? "Disable password protection for this page" : "Enable password protection for this page";
       });
@@ -110,7 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Allow user to set password
     sp.addEventListener('click', ()=>{
-      setKey(updateContentIfKeyIsSet);
+      localStorage.password = pi.value;
+      updateContent();
     });
+
+    pi.addEventListener("input", updateContent);
   });
 });
