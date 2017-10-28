@@ -58,6 +58,7 @@ function changePageProtectionState(callback) {
   getCurrentTabUrl((url)=>{
     getSavedPageState(url, (state)=>{
       items[url] = !state;
+      items.password = localStorage.password;
       chrome.storage.sync.set(items);
       if (typeof callback !== 'undefined') callback(!state);
     });

@@ -12,7 +12,7 @@ function getSavedPageState(url, callback) {
   // for chrome.runtime.lastError to ensure correctness even when the API call
   // fails.
   chrome.storage.sync.get(url, (items) => {
-    callback(chrome.runtime.lastError ? false : items[url]);
+    callback(chrome.runtime.lastError ? null : items[url]);
   });
 }
 
@@ -20,6 +20,11 @@ function getSavedPageState(url, callback) {
 getSavedPageState(location.hostname, (state)=>{
   console.log(state);
   if (state) {
-    prompt("Please enter your password");
+    chrome.storage.sync.get("password", (items)=>{
+      while (prompt("Please enter your password") !== items.password) {
+        alert("Sorry! Wrong password! Please try again!");
+      }
+      console.log("Passwords matched!");
+    });
   }
 });
