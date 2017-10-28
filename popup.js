@@ -55,9 +55,53 @@ function changePageProtectionState(callback) {
   });
 }
 
+/**
+ * Check if a password is set
+ * @param {function(bool)} callback Function to be called after checking if password is set.
+ */
+function getKeyState(callback) {
+  console.log("Getting state of password");
+  getCurrentTabUrl((url)=>{
+    chrome.storage.sync.get(url, (items) => {
+      console.log(items);
+      callback(chrome.runtime.lastError ? false : typeof items["password"] === "string");
+    });
+  });
+}
+
+/**
+ * Set a password
+ * @param {function()} callback Function to be called after setting password.
+ */
+function setKey(callback) {
+  while (typeof key !== "string" || !key.length) {
+    var key = prompt("Please enter a password");
+  }
+  console.log("Setting password");
+  var items = {};
+  items["password"] = key;
+  console.log(items);
+  chrome.storage.sync.set(items, ()=>{
+    if (typeof callback !== 'undefined') callback();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   getCurrentTabUrl((url) => {
     var a = document.getElementById('a');
+    var sp = document.getElementById("set-password");
+
+    // Check if a password is set and update the popup view accordingly
+    function updateContentIfKeyIsSet () {
+      getKeyState((keyIsSet)=>{
+        if (keyIsSet) {
+          sp.style.display = "none";
+          a.style.display = "block";
+          updateContent();
+        }
+      });
+    }
+    updateContentIfKeyIsSet();
 
     // Load the saved state for this domain and modify the popup window
     // text, if needed.
@@ -66,13 +110,16 @@ document.addEventListener('DOMContentLoaded', () => {
         a.innerText = state ? "Disable password protection for this page" : "Enable password protection for this page";
       });
     }
-    updateContent();
 
     // Allow user to change page state
     a.addEventListener('click', () => {
-      console.log("a clicked!");
       a.innerText = "";
       changePageProtectionState(updateContent);
+    });
+
+    // Allow user to set password
+    sp.addEventListener('click', ()=>{
+      setKey(updateContentIfKeyIsSet);
     });
   });
 });
