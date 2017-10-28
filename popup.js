@@ -45,14 +45,16 @@ function getSavedPageState(url, callback) {
  * @param {function} callback Function to be called after saving state.
  */
 function changePageProtectionState(callback) {
-  var items = {};
-  getCurrentTabUrl((url)=>{
-    getSavedPageState(url, (state)=>{
-      items[url] = !state;
-      chrome.storage.sync.set(items);
-      if (typeof callback !== 'undefined') callback(!state);
+  if (prompt("Enter your password to proceed:") == localStorage.password) {
+    var items = {};
+    getCurrentTabUrl((url)=>{
+      getSavedPageState(url, (state)=>{
+        items[url] = !state;
+        chrome.storage.sync.set(items);
+        if (typeof callback !== 'undefined') callback(!state);
+      });
     });
-  });
+  }
 }
 
 /**
@@ -61,12 +63,7 @@ function changePageProtectionState(callback) {
  */
 function getKeyState(callback) {
   console.log("Getting state of password");
-  getCurrentTabUrl((url)=>{
-    chrome.storage.sync.get(url, (items) => {
-      console.log(items);
-      callback(chrome.runtime.lastError ? false : typeof items["password"] === "string");
-    });
-  });
+  callback(typeof localStorage.password === "string");
 }
 
 /**
@@ -77,13 +74,7 @@ function setKey(callback) {
   while (typeof key !== "string" || !key.length) {
     var key = prompt("Please enter a password");
   }
-  console.log("Setting password");
-  var items = {};
-  items["password"] = key;
-  console.log(items);
-  chrome.storage.sync.set(items, ()=>{
-    if (typeof callback !== 'undefined') callback();
-  });
+  localStorage.password = key;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
