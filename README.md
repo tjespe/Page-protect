@@ -12,4 +12,4 @@ If you enable password protection on a website, the page will go white when you 
 4. Make sure developer mode is turned on
 5. Click the "load unpacked extension" button
 6. Locate the folder where you saved the source code
-7. The extension is now installed! Click it and enter a password to set a password
+7. The extension is now installed! Click on the icon and enter a password to set a password.
