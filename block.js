@@ -1,5 +1,3 @@
-console.log("Running block.js", location);
-
 /**
  * Gets the saved state for url.
  *
@@ -24,19 +22,31 @@ getSavedPageState(location.hostname, (state)=>{
       document.body.innerHTML += `<div id="overlay-pr" style="
       height: 100%;
       width: 100%;
-      position: absolute;
+      position: fixed;
       background: #fff;
       z-index: 99999;
       top: 0;
-      "></div>`
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: ubuntu,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif,'Apple Color Emoji','Segoe UI Emoji','Segoe UI Symbol';
+      font-size: 18px!important;
+      ">
+        <div style="padding-bottom:100px">
+          <h3 style="text-align:center;font-weight:200;font-size:18px!important;margin:18px auto!important">Enter your password:</h3>
+          <input type=password id="pp-pass" style="border-radius: 5px; border: 1px solid #bbb; font-size: 1.3em; text-align: center" autofocus>
+        </div>
+      </div>`
       chrome.storage.sync.get("password", (items)=>{
-        while (prompt("Please enter your password") !== items.password) {
-          alert("Sorry! Wrong password! Please try again!");
-        }
-        console.log("Passwords matched!");
-        document.body.removeChild(document.getElementById("overlay-pr"));
-        sessionStorage.last_auth = Date.now();
-        if (typeof callback !== 'undefined') callback(!state);
+        let interval = setInterval(()=>{
+          if (document.getElementById("pp-pass").value === items.password) {
+            console.log("Passwords matched!");
+            document.body.removeChild(document.getElementById("overlay-pr"));
+            sessionStorage.last_auth = Date.now();
+            if (typeof callback !== 'undefined') callback(!state);
+            clearInterval(interval);
+          }
+        }, 50);
       });
     }
   }
