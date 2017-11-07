@@ -20,5 +20,11 @@
     "activeTab",
     "storage",
     "tabs"
-  ]
+  ],
+  "applications": {
+    "gecko": {
+      "id": "page-protect@page-protect",
+      "strict_min_version": "42.0"
+    }
+  }
 }
